@@ -1,0 +1,17 @@
+{
+  "num": "09",
+  "slug": "marin-ai-09-flower",
+  "theme": "Marin Premium AI 09 Flower",
+  "title": "Çiçek Tarlası",
+  "wallpaper": "Marin-ai-09-flower.jpg",
+  "source": "source-09.jpg",
+  "source_root": "~/marin-premium-ai/sources",
+  "palette": {
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "accent": "#cc8683",
+    "primary": "#dac5a5",
+    "secondary": "#76bc5c"
+  },
+  "generator": "tools/marin_generate.py"
+}

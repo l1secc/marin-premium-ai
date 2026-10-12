@@ -1,0 +1,17 @@
+{
+  "num": "10",
+  "slug": "marin-ai-10-beach",
+  "theme": "Marin Premium AI 10 Beach",
+  "title": "Sahil",
+  "wallpaper": "Marin-ai-10-beach.jpg",
+  "source": "source-10.jpg",
+  "source_root": "~/marin-premium-ai/sources",
+  "palette": {
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "accent": "#9bcee2",
+    "primary": "#ce9686",
+    "secondary": "#a8a4da"
+  },
+  "generator": "tools/marin_generate.py"
+}

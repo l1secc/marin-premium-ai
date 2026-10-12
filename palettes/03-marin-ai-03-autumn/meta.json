@@ -1,0 +1,17 @@
+{
+  "num": "03",
+  "slug": "marin-ai-03-autumn",
+  "theme": "Marin Premium AI 03 Autumn",
+  "title": "Sonbahar",
+  "wallpaper": "Marin-ai-03-autumn.jpg",
+  "source": "source-03.jpg",
+  "source_root": "~/marin-premium-ai/sources",
+  "palette": {
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "accent": "#cc6554",
+    "primary": "#c98f5c",
+    "secondary": "#bca25c"
+  },
+  "generator": "tools/marin_generate.py"
+}

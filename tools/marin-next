@@ -1,0 +1,223 @@
+#!/bin/bash
+
+# omarchy:summary=Switch the Marin Premium photo (wallpaper + terminal + menu)
+# omarchy:args=[next|prev|sync|<num>|<name>] [--quiet] [--force] [--light]
+# omarchy:examples=marin-next | marin-next prev | marin-next 20 | marin-next sync
+
+# All Marin photos live under the single `marin-premium` theme, and every photo
+# owns a palette bundle in palettes/<num>-<slug>/. Switching one photo means:
+#
+#   1. copy that bundle's colors.toml / shell.toml / waybar.css / hyprland.conf
+#      onto the theme root (the *active* palette), then
+#   2. re-apply the theme with OMARCHY_THEME_SKIP_BACKGROUND=1, so Omarchy
+#      regenerates every terminal config from the new colors.toml, pushes the
+#      new shell.toml at the running shell (bar, menu, launcher, lock, OSD)
+#      and retints running Foot windows via OSC — all without touching the
+#      wallpaper, then
+#   3. pin the matching wallpaper.
+#
+# `sync` retints the desktop to whatever photo is *already* the background, and
+# is what `marin-bg-watch` calls when Omarchy's own picker (Omarchy menu →
+# Style → Background, `omarchy theme bg next`) changes the photo. It is
+# idempotent: when the staged palette is already the photo's palette it does
+# nothing at all, which is what keeps the watch loop from feeding itself.
+
+set -euo pipefail
+
+THEME="marin-premium"
+THEME_DIR="$HOME/.config/omarchy/themes/$THEME"
+PALETTES_DIR="$THEME_DIR/palettes"
+BACKGROUNDS_DIR="$THEME_DIR/backgrounds"
+CURRENT_DIR="$HOME/.local/state/omarchy/current"
+STAGED_THEME_DIR="$CURRENT_DIR/theme"
+STAGED_BG_DIR="$STAGED_THEME_DIR/backgrounds"
+CURRENT_BG_LINK="$CURRENT_DIR/background"
+THEME_NAME_FILE="$CURRENT_DIR/theme.name"
+
+BUNDLE_FILES=(colors.toml shell.toml waybar.css hyprland.conf)
+
+QUIET=0
+FORCE=0
+LIGHT=0
+ARG=""
+for arg in "$@"; do
+  case "$arg" in
+    --quiet | -q) QUIET=1 ;;
+    --force | -f) FORCE=1 ;;
+    --light) LIGHT=1 ;;
+    -h | --help)
+      sed -n '3,5p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+      exit 0
+      ;;
+    *)
+      ARG="$arg"
+      ;;
+  esac
+done
+
+say() { (( QUIET )) || printf '%s\n' "$*"; }
+warn() { printf '%s\n' "$*" >&2; }
+
+json_field() { # json_field <file> <key>
+  python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get(sys.argv[2],""))' "$1" "$2" 2>/dev/null || true
+}
+
+mapfile -t BUNDLES < <(find "$PALETTES_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort)
+COUNT=${#BUNDLES[@]}
+if (( COUNT == 0 )); then
+  warn "No palette bundles found in $PALETTES_DIR"
+  exit 1
+fi
+
+bundle_wall() { json_field "$1/meta.json" wallpaper; }
+bundle_title() { json_field "$1/meta.json" title; }
+
+current_background() { readlink -f "$CURRENT_BG_LINK" 2>/dev/null || true; }
+
+# --- which photo is on screen right now? ------------------------------------
+# The wallpaper is authoritative. When it is a photo Omarchy itself owns (a
+# bundled one, or one the user dropped in by hand) fall back to the photo
+# number in its name, then to the palette that is staged, then give up (-1).
+current_index() {
+  local bg base i num
+  bg="$(current_background)"
+  if [[ -n $bg ]]; then
+    base=${bg##*/}
+    for i in "${!BUNDLES[@]}"; do
+      [[ "$(bundle_wall "${BUNDLES[$i]}")" == "$base" ]] && { printf '%s' "$i"; return; }
+    done
+    if [[ $base =~ ^[A-Za-z]+-([0-9]+) ]]; then
+      num=$(( 10#${BASH_REMATCH[1]} ))
+      for i in "${!BUNDLES[@]}"; do
+        [[ "$(basename -- "${BUNDLES[$i]}")" == "$(printf '%02d' "$num")-"* ]] && { printf '%s' "$i"; return; }
+      done
+    fi
+  fi
+
+  for i in "${!BUNDLES[@]}"; do
+    if [[ -f $STAGED_THEME_DIR/colors.toml ]] &&
+      cmp -s "${BUNDLES[$i]}/colors.toml" "$STAGED_THEME_DIR/colors.toml"; then
+      printf '%s' "$i"
+      return
+    fi
+  done
+
+  printf '%s' -1
+}
+
+INDEX="$(current_index)"
+TARGET=-1
+SET_BG=1
+
+case "$ARG" in
+  "" | next) TARGET=$(( (INDEX + 1 + COUNT) % COUNT )) ;;
+  prev | previous) TARGET=$(( (INDEX - 1 + 2 * COUNT) % COUNT )) ;;
+  sync)
+    (( INDEX >= 0 )) || { say "Marin Premium: current photo has no palette — nothing to sync"; exit 0; }
+    TARGET=$INDEX
+    # `sync` only retints: the wallpaper is whatever the caller already set.
+    SET_BG=0
+    ;;
+  [0-9]*) TARGET=$(( 10#$ARG - 1 )) ;;
+  *)
+    for i in "${!BUNDLES[@]}"; do
+      [[ "${BUNDLES[$i]##*/}" == *"$ARG"* ]] && { TARGET=$i; break; }
+    done
+    if (( TARGET < 0 )); then
+      for i in "${!BUNDLES[@]}"; do
+        [[ "$(bundle_wall "${BUNDLES[$i]}")" == *"$ARG"* ]] && { TARGET=$i; break; }
+      done
+    fi
+    ;;
+esac
+
+if (( TARGET < 0 || TARGET >= COUNT )); then
+  warn "No Marin photo matches: $ARG (have $(basename "${BUNDLES[0]}")…$(basename "${BUNDLES[$((COUNT - 1))]}"))"
+  exit 1
+fi
+
+BUNDLE="${BUNDLES[$TARGET]}"
+WALL="$(bundle_wall "$BUNDLE")"
+TITLE="$(bundle_title "$BUNDLE")"
+[[ -n $WALL ]] || { warn "Palette bundle $BUNDLE has no wallpaper in meta.json"; exit 1; }
+
+# The staged copy is what the running desktop reads; the theme's own copy is
+# what `omarchy theme set` stages next time.
+WALL_PATH="$BACKGROUNDS_DIR/$WALL"
+[[ -f "$STAGED_BG_DIR/$WALL" ]] && WALL_PATH="$STAGED_BG_DIR/$WALL"
+
+# --- is the palette already live? -------------------------------------------
+palette_is_live() {
+  [[ -f $STAGED_THEME_DIR/colors.toml ]] || return 1
+  local f
+  for f in "${BUNDLE_FILES[@]}"; do
+    [[ -f "$BUNDLE/$f" ]] || continue
+    cmp -s "$BUNDLE/$f" "$STAGED_THEME_DIR/$f" || return 1
+  done
+  return 0
+}
+
+# --- 1. install the photo's palette at the theme root ------------------------
+for f in "${BUNDLE_FILES[@]}"; do
+  [[ -f "$BUNDLE/$f" ]] || continue
+  cmp -s "$BUNDLE/$f" "$THEME_DIR/$f" || cp -f "$BUNDLE/$f" "$THEME_DIR/$f"
+done
+
+# --- 2. retint every generated surface (no wallpaper change) ------------------
+#
+# `--light` stages the palette and hot-reloads the running desktop (shell IPC +
+# Foot OSC) instead of running the full `omarchy-theme-set` chain. That chain
+# spawns every app-restart hook and the privileged browser-policy hook, which is
+# exactly the ~250 MB spike the background watcher used to cause on every
+# wallpaper change. The light path touches only user-owned files and the shell
+# socket, so the watcher can run sandboxed with no way to escalate.
+light_retint() {
+  local live="$STAGED_THEME_DIR" f colors_payload shell_payload
+
+  [[ -d $live && -f $live/colors.toml ]] || return 1
+
+  # Stage the active palette where apps actually read it.
+  for f in "${BUNDLE_FILES[@]}"; do
+    [[ -f "$THEME_DIR/$f" ]] || continue
+    install -m644 "$THEME_DIR/$f" "$live/$f" || return 1
+  done
+
+  # Hot-reload the running shell (bar / menu / launcher / lock / OSD).
+  if command -v omarchy-shell >/dev/null 2>&1; then
+    colors_payload=$(base64 -w0 "$live/colors.toml" 2>/dev/null) || return 1
+    shell_payload=$(base64 -w0 "$live/shell.toml" 2>/dev/null) || return 1
+    timeout 3 omarchy-shell -q shell applyTheme "$colors_payload" "$shell_payload" || return 1
+  fi
+
+  # Retint every already-running Foot window through OSC.
+  if command -v omarchy-theme-set-foot >/dev/null 2>&1; then
+    omarchy-theme-set-foot >/dev/null 2>&1 || true
+  fi
+
+  return 0
+}
+
+if (( FORCE )) || ! palette_is_live; then
+  if (( LIGHT )) && light_retint; then
+    say "Marin Premium: ${TITLE:-$WALL} palette retinted (light)"
+  else
+    (( LIGHT )) && say "Marin Premium: light retint unavailable, applying full theme"
+    OMARCHY_THEME_SKIP_BACKGROUND=1 omarchy-theme-set "$THEME"
+  fi
+else
+  say "Marin Premium: ${TITLE:-$WALL} palette already live"
+fi
+
+# --- 3. pin this photo as the wallpaper --------------------------------------
+if (( SET_BG )) && { (( FORCE )) || [[ "$(current_background)" != "$(readlink -f "$WALL_PATH")" ]]; }; then
+  omarchy-theme-bg-set "$WALL_PATH"
+fi
+
+# --- 4. notify with the photo itself -----------------------------------------
+if (( ! QUIET )) && command -v omarchy-notification-send >/dev/null 2>&1; then
+  omarchy-notification-send "Marin Premium · ${TITLE:-$WALL}" \
+    "Foto + terminal + menü değişti · $((TARGET + 1))/$COUNT" \
+    --image "$BACKGROUNDS_DIR/$WALL" -t 2500 >/dev/null 2>&1 || true
+fi
+
+say "Marin Premium → ${TITLE:-$WALL} ($((TARGET + 1))/$COUNT)"

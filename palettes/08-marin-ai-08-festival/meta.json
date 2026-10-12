@@ -1,0 +1,17 @@
+{
+  "num": "08",
+  "slug": "marin-ai-08-festival",
+  "theme": "Marin Premium AI 08 Festival",
+  "title": "Festival",
+  "wallpaper": "Marin-ai-08-festival.jpg",
+  "source": "source-08.jpg",
+  "source_root": "~/marin-premium-ai/sources",
+  "palette": {
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "accent": "#bc635c",
+    "primary": "#5085c8",
+    "secondary": "#c87a9e"
+  },
+  "generator": "tools/marin_generate.py"
+}

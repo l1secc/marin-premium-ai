@@ -1,0 +1,17 @@
+{
+  "num": "06",
+  "slug": "marin-ai-06-class",
+  "theme": "Marin Premium AI 06 Class",
+  "title": "Sınıf",
+  "wallpaper": "Marin-ai-06-class.jpg",
+  "source": "source-06.jpg",
+  "source_root": "~/marin-premium-ai/sources",
+  "palette": {
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "accent": "#d69aa0",
+    "primary": "#d7aa9d",
+    "secondary": "#d9cfa3"
+  },
+  "generator": "tools/marin_generate.py"
+}

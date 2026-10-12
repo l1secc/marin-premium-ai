@@ -1,0 +1,17 @@
+# Agent / local-only state
+.pi/
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Optional local wallpaper cache (ship wallpapers in backgrounds/ instead)
+backgrounds/*.tmp
+
+# Local source art used by tools/marin_generate.py (not redistributed)
+marin_kitagawa/
+
+# Python bytecode
+tools/__pycache__/
+__pycache__/
+*.pyc

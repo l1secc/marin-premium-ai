@@ -1,0 +1,17 @@
+{
+  "num": "02",
+  "slug": "marin-ai-02-neon",
+  "theme": "Marin Premium AI 02 Neon",
+  "title": "Neon Gece",
+  "wallpaper": "Marin-ai-02-neon.jpg",
+  "source": "source-02.jpg",
+  "source_root": "~/marin-premium-ai/sources",
+  "palette": {
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "accent": "#a957c1",
+    "primary": "#7c72c5",
+    "secondary": "#4185d8"
+  },
+  "generator": "tools/marin_generate.py"
+}

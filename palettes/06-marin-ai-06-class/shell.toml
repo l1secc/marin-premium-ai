@@ -1,0 +1,145 @@
+# ============================================================================
+#  Marin Kitagawa — "Marin Premium" · Sınıf
+#  Retinted from the wallpaper palette by tools/marin_generate.py
+#  surface #211617 · accent #d69aa0 · primary #d7aa9d · secondary #d9cfa3
+# ============================================================================
+
+[bar]
+background       = "#211617"
+background-alpha = 0.88
+text             = "#e1dbdb"
+active           = "#d69aa0"
+scale-with-font  = true
+size-horizontal  = 30
+size-vertical    = 32
+
+[hyprland]
+# Same 3-stop gradient as the active window border — visual unity
+active-border            = "rgba(d69aa0ee) rgba(d9cfa3ee) rgba(d7aa9dee) 45deg"
+active-border-foreground = "#d69aa0"
+
+[controls]
+normal-color        = "#d1c2c4"
+normal-fill-alpha   = 0.05
+normal-border       = "#d1c2c4"
+normal-border-width = 1
+normal-border-alpha = 0.30
+
+hover-cursor-color        = "#f3f2f2"
+hover-cursor-fill-alpha   = 0.10
+hover-cursor-border       = "#d69aa0"
+hover-cursor-border-width = 1
+hover-cursor-border-alpha = 0.55
+
+focus-color        = "#d69aa0"
+focus-fill-alpha   = 0.12
+focus-border       = "#d69aa0"
+focus-border-width = 1
+focus-border-alpha = 0.85
+
+selected-color        = "#d7aa9d"
+selected-fill-alpha   = 0.18
+selected-border       = "#d7aa9d"
+selected-border-width = 1
+selected-border-alpha = 0.60
+
+pressed-fill-alpha   = 0.22
+selection-fill-alpha = 0.35
+
+[spacing]
+scale            = 1.0
+scale-with-font  = true
+
+[font]
+base-size = 12
+
+[popups]
+background       = "#2c1c1e"
+background-alpha = 0.92
+text             = "#e1dbdb"
+border           = "hyprland.active-border"
+border-alpha     = 1.0
+border-width     = 2
+
+[tooltip]
+background       = "#2c1c1e"
+background-alpha = 0.92
+text             = "#f3f2f2"
+border           = "#d69aa0"
+border-alpha     = 1.0
+border-width     = 1
+
+[notifications]
+background       = "#2c1c1e"
+background-alpha = 0.92
+text             = "#e1dbdb"
+border           = "hyprland.active-border"
+border-alpha     = 1.0
+border-width     = 2
+countdown        = "#d69aa0"
+
+[launcher]
+background                = "#211617"
+background-alpha          = 0.95
+text                      = "#f3f2f2"
+border                    = "#d69aa0"
+border-alpha              = 1.0
+scrim                     = "#211617"
+scrim-alpha               = 0.55
+selected-background       = "#573e40"
+selected-background-alpha = 0.30
+selected-text             = "#efc8d2"
+selected-border           = "#d69aa0"
+selected-border-alpha     = 0.94
+selected-border-width     = 1
+
+[menu]
+background                = "#211617"
+background-alpha          = 0.95
+text                      = "#f3f2f2"
+border                    = "#d69aa0"
+border-alpha              = 1.0
+scrim                     = "#211617"
+scrim-alpha               = 0.55
+selected-background       = "#573e40"
+selected-background-alpha = 0.30
+selected-text             = "#efc8d2"
+selected-border           = "#d69aa0"
+selected-border-alpha     = 0.94
+selected-border-width     = 1
+
+[polkit]
+background       = "#211617"
+background-alpha = 0.95
+text             = "#e1dbdb"
+text-error       = "#cd6f86"
+border           = "hyprland.active-border"
+border-error     = "#cd6f86"
+border-alpha     = 1.0
+border-width     = 2
+scrim            = "#211617"
+scrim-alpha      = 0.5
+accent           = "#d69aa0"
+
+[lock]
+background       = "#211617"
+background-alpha = 0.80
+text             = "#e1dbdb"
+placeholder      = "#a1787c"
+text-error       = "#cd6f86"
+border           = "hyprland.active-border"
+border-active    = "hyprland.active-border"
+border-error     = "#cd6f86"
+border-alpha     = 1.0
+border-width     = 2
+selection        = "#d69aa0"
+selection-alpha  = 0.45
+
+[image-picker]
+scrim                   = "#211617"
+scrim-alpha             = "0.5"
+text                    = "#e1dbdb"
+selected-border         = "#d69aa0"
+selected-border-alpha   = 1.0
+unselected-border       = "#d1c2c4"
+unselected-border-alpha = 0.28

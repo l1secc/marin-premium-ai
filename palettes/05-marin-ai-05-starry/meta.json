@@ -1,0 +1,17 @@
+{
+  "num": "05",
+  "slug": "marin-ai-05-starry",
+  "theme": "Marin Premium AI 05 Starry",
+  "title": "Yıldızlı Gece",
+  "wallpaper": "Marin-ai-05-starry.jpg",
+  "source": "source-05.jpg",
+  "source_root": "~/marin-premium-ai/sources",
+  "palette": {
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "accent": "#3a8bdf",
+    "primary": "#c47570",
+    "secondary": "#6075de"
+  },
+  "generator": "tools/marin_generate.py"
+}

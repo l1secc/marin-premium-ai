@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+# ============================================================================
+#  Marin Premium · switcher + background watcher bootstrap
+#
+#  Puts the photo switcher (`marin-next`) and the Omarchy background watcher
+#  (`marin-bg-watch`) on PATH, and installs the systemd user service that runs
+#  the watcher, so a photo picked from Omarchy's own background picker retints
+#  the terminal and the menu too.
+#
+#  Idempotent: safe to run from install.sh, from the theme-set hook after
+#  `omarchy theme update`, or by hand. Theme repos are not allowed to install
+#  code by themselves, so this is the one-time step that does it.
+#
+#  Usage:
+#    marin-bootstrap [--quiet] [--no-service] [--uninstall]
+# ============================================================================
+set -euo pipefail
+
+THEME_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+BIN_DIR="${XDG_BIN_HOME:-$HOME/.local/bin}"
+UNIT_NAME="marin-premium-bg-sync.service"
+UNIT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+UNIT_FILE="$UNIT_DIR/$UNIT_NAME"
+EZA_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/eza"
+EZA_THEME="$EZA_DIR/theme.yml"
+EZA_BACKUP="$EZA_DIR/theme.yml.pre-marin"
+HYPR_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/hypr"
+HYPR_LOOKNFEEL="$HYPR_DIR/looknfeel.lua"
+HYPR_BACKUP="$HYPR_DIR/looknfeel.lua.pre-marin"
+FOOT_INI="${XDG_CONFIG_HOME:-$HOME/.config}/foot/foot.ini"
+FOOT_MARK_BEGIN="# >>> marin-premium theme (managed) >>>"
+FOOT_MARK_END="# <<< marin-premium theme (managed) <<<"
+
+QUIET=0
+WITH_SERVICE=1
+UNINSTALL=0
+for arg in "$@"; do
+  case "$arg" in
+    --quiet | -q) QUIET=1 ;;
+    --no-service) WITH_SERVICE=0 ;;
+    --uninstall) UNINSTALL=1 ;;
+    -h | --help) sed -n '3,16p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) echo "Unknown option: $arg" >&2; exit 2 ;;
+  esac
+done
+
+say() { (( QUIET )) || printf '%s\n' "$*"; }
+
+# foot.ini without our managed block (stdio: file -> stdout).
+foot_without_block() {
+  [[ -f $FOOT_INI ]] || return 0
+  awk -v b="$FOOT_MARK_BEGIN" -v e="$FOOT_MARK_END" '
+    $0 == b { skip = 1; next }
+    $0 == e { skip = 0; next }
+    !skip { print }
+  ' "$FOOT_INI"
+}
+
+if (( UNINSTALL )); then
+  systemctl --user disable --now "$UNIT_NAME" >/dev/null 2>&1 || true
+  rm -f "$UNIT_FILE" "$BIN_DIR/marin-next" "$BIN_DIR/marin-bg-watch"
+  systemctl --user daemon-reload >/dev/null 2>&1 || true
+  # eza file-kind colours: only remove our own file, and put back a backed-up one.
+  if [[ -f $EZA_THEME ]] && cmp -s "$EZA_THEME" "$THEME_DIR/eza/theme.yml"; then
+    rm -f "$EZA_THEME"
+    if [[ -f $EZA_BACKUP ]]; then
+      mv "$EZA_BACKUP" "$EZA_THEME"
+      say "restored your previous $EZA_THEME"
+    fi
+  fi
+  # Soft look: drop our look'n'feel, restore a backed-up one.
+  if [[ -f $HYPR_LOOKNFEEL ]] && cmp -s "$HYPR_LOOKNFEEL" "$THEME_DIR/hypr/looknfeel.lua"; then
+    rm -f "$HYPR_LOOKNFEEL"
+    if [[ -f $HYPR_BACKUP ]]; then
+      mv "$HYPR_BACKUP" "$HYPR_LOOKNFEEL"
+      say "restored your previous $HYPR_LOOKNFEEL"
+    fi
+  fi
+  # Terminal translucency block.
+  if [[ -f $FOOT_INI ]] && grep -qF "$FOOT_MARK_BEGIN" "$FOOT_INI"; then
+    tmp=$(mktemp)
+    foot_without_block >"$tmp" && install -m644 "$tmp" "$FOOT_INI"
+    rm -f "$tmp"
+    say "removed the managed block from $FOOT_INI"
+  fi
+  hyprctl reload >/dev/null 2>&1 || true
+  omarchy-restart-terminal >/dev/null 2>&1 || true
+  say "Removed marin-next, marin-bg-watch, $UNIT_NAME, the eza theme, the look'n'feel and the terminal translucency"
+  exit 0
+fi
+
+# 1. Switcher + watcher on PATH.
+mkdir -p "$BIN_DIR"
+for tool in marin-next marin-bg-watch; do
+  [[ -f $THEME_DIR/tools/$tool ]] || { echo "! missing $THEME_DIR/tools/$tool" >&2; exit 1; }
+  install -m755 "$THEME_DIR/tools/$tool" "$BIN_DIR/$tool"
+done
+say "✓ $BIN_DIR/marin-next"
+say "✓ $BIN_DIR/marin-bg-watch"
+
+# 2. systemd user service: retint when Omarchy's own picker changes the photo.
+if (( WITH_SERVICE )) && [[ -f $THEME_DIR/systemd/$UNIT_NAME ]] && command -v systemctl >/dev/null 2>&1; then
+  mkdir -p "$UNIT_DIR"
+  unit_tmp="$(mktemp)"
+  sed "s|@WATCHER@|$BIN_DIR/marin-bg-watch|" "$THEME_DIR/systemd/$UNIT_NAME" >"$unit_tmp"
+  if ! cmp -s "$unit_tmp" "$UNIT_FILE"; then
+    install -m644 "$unit_tmp" "$UNIT_FILE"
+    systemctl --user daemon-reload >/dev/null 2>&1 || true
+    say "✓ $UNIT_FILE"
+  fi
+  rm -f "$unit_tmp"
+  systemctl --user enable --now "$UNIT_NAME" >/dev/null 2>&1 || true
+  if systemctl --user is-active --quiet "$UNIT_NAME"; then
+    say "✓ $UNIT_NAME running"
+  else
+    say "! $UNIT_NAME could not be started (background photo changes will not retint until it runs)"
+  fi
+fi
+
+count=$(find "$THEME_DIR/palettes" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
+say "Marin Premium: $count photos under one theme."
+
+# 3. eza file-kind colours: folders (and images) red, so `ls` reads Marin red
+#    while the terminal's own text stays white. Named ANSI slots, so it follows
+#    whichever palette the active theme puts there.
+if [[ -f $THEME_DIR/eza/theme.yml ]] && command -v eza >/dev/null 2>&1; then
+  mkdir -p "$EZA_DIR"
+  if [[ -f $EZA_THEME ]] && ! cmp -s "$EZA_THEME" "$THEME_DIR/eza/theme.yml" && [[ ! -f $EZA_BACKUP ]]; then
+    cp -p "$EZA_THEME" "$EZA_BACKUP"
+    say "✓ kept your previous eza theme as $EZA_BACKUP"
+  fi
+  if ! cmp -s "$EZA_THEME" "$THEME_DIR/eza/theme.yml"; then
+    install -m644 "$THEME_DIR/eza/theme.yml" "$EZA_THEME"
+    say "✓ $EZA_THEME (folders red, text white)"
+  fi
+fi
+
+# 4. Soft look: rounded corners, soft shadows and blur for Hyprland — the
+#    Omarchy shell mirrors decoration:rounding into its own corner radius, so
+#    this softens the bar, menu, launcher and notifications too.
+if [[ -f $THEME_DIR/hypr/looknfeel.lua ]]; then
+  mkdir -p "$HYPR_DIR"
+  if [[ -f $HYPR_LOOKNFEEL ]] && ! cmp -s "$HYPR_LOOKNFEEL" "$THEME_DIR/hypr/looknfeel.lua" && [[ ! -f $HYPR_BACKUP ]]; then
+    cp -p "$HYPR_LOOKNFEEL" "$HYPR_BACKUP"
+    say "✓ kept your previous look'n'feel as $HYPR_BACKUP"
+  fi
+  if ! cmp -s "$HYPR_LOOKNFEEL" "$THEME_DIR/hypr/looknfeel.lua"; then
+    install -m644 "$THEME_DIR/hypr/looknfeel.lua" "$HYPR_LOOKNFEEL"
+    hyprctl reload >/dev/null 2>&1 || true
+    say "✓ $HYPR_LOOKNFEEL (rounded corners, blur, soft shadows)"
+  fi
+fi
+
+# 5. Translucent terminal: foot's own background alpha (text stays crisp),
+#    appended to the user's foot.ini between managed markers.
+if [[ -f $THEME_DIR/foot/marin-foot.ini && -f $FOOT_INI ]]; then
+  tmp=$(mktemp)
+  foot_without_block >"$tmp"
+  printf '%s\n' "$FOOT_MARK_BEGIN" >>"$tmp"
+  cat "$THEME_DIR/foot/marin-foot.ini" >>"$tmp"
+  printf '%s\n' "$FOOT_MARK_END" >>"$tmp"
+  if ! cmp -s "$tmp" "$FOOT_INI"; then
+    install -m644 "$tmp" "$FOOT_INI"
+    omarchy-restart-terminal >/dev/null 2>&1 || true
+    say "✓ translucent terminal ($FOOT_INI)"
+  fi
+  rm -f "$tmp"
+fi

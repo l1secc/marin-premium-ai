@@ -1,0 +1,30 @@
+# ============================================================================
+#  Marin Premium · eza file-kind colours
+#
+#  Omarchy aliases `ls` to `eza`, and eza paints file and folder *names* from
+#  its own theme — not from the terminal's default foreground. That is why the
+#  terminal text can stay white while folder names read Marin's rose-pink.
+#
+#  Colours are named ANSI slots, so this follows whatever palette the active
+#  Omarchy theme puts in those slots (here: color1 / color9 = Marin's vivid
+#  rose-pink) instead of pinning hex values.
+#
+#  Installed to ~/.config/eza/theme.yml by tools/marin-bootstrap.
+# ============================================================================
+
+filekinds:
+  # Folders in Marin rose-pink (eza's own default is bold blue).
+  directory:
+    foreground: Red
+    is_bold: true
+  # Symlinks and mount points stay legible on black.
+  symlink:
+    foreground: Cyan
+  executable:
+    foreground: Green
+    is_bold: true
+
+file_type:
+  # Images were magenta (Marin pink) by default; read them as rose-pink.
+  image:
+    foreground: Red

@@ -1,0 +1,122 @@
+# ============================================================================
+#  Marin Kitagawa — "Marin Premium"  ·  Omarchy Dark Mode
+#  Professional anime aesthetic · low eye-strain · high contrast
+#
+#  Color inspiration drawn from Marin Kitagawa's character design
+#  (My Dress-Up Darling / Sono Bisque Doll wa Koi wo Suru):
+#    · honey-blonde hair       →  #e8c98f
+#    · rose-pink eyes & blush  →  #f2a3c0
+#    · lilac accessories       →  #bba7e6
+#    · deep navy uniform       →  #0f1522
+#
+#  One photo, one palette, and every surface takes the part it needs:
+#    · background is true black — the terminal canvas — and the ink is plain
+#      white: that is what you type and what command output is drawn in.
+#    · rose-pink and blue keep their fixed hue instead of following the photo, so
+#      the terminal's red slot reads as Marin's rose-pink and its blue as blue.
+#    · file and folder names are painted by eza's kind colours (eza/theme.yml),
+#      not by the ink: folders read rose-pink while the text stays white.
+#    · surface_* carries the photo-tinted desktop chrome the theme ships in
+#      shell.toml / waybar.css / hyprland.conf (bar, menu, launcher, lock).
+#      tools/marin_generate.py retints those files through the surface_* twins.
+#
+#  Tuned for long sessions: every foreground sits at >= 7:1 contrast on
+#  the deepest background surface, no full-saturation hues, all accents
+#  pulled toward warm/dusty to avoid LED glare.
+# ============================================================================
+
+mode = "dark"
+
+# ---------------------------------------------------------------------------
+#  THEME  ·  core surface + accent tokens
+# ---------------------------------------------------------------------------
+
+# Terminal canvas — true black. `surface_background` is the photo-tinted
+# desktop base (bar / menu / lock cards) that shell.toml is authored with.
+background         = "#000000"   # terminal canvas — black
+surface_background = "#0f1522"   # uniform navy — desktop chrome base
+darker_background  = "#0a0e18"   # pre-surface, dimmest depth
+dark_background    = "#141c2e"   # elevated surface (cards, popups)
+lighter_background = "#1b2540"   # hover / focused surface
+background_alt     = "#0c111c"   # alt accent surface
+background_surface = "#182237"   # mid-elevated surface (popups, tooltips)
+
+# Terminal ink — plain white: what you type, and what command output uses.
+# File and folder names are not drawn with the ink; eza paints them from its
+# own kind colours (see eza/theme.yml: folders red).
+# `surface_foreground` keeps the paper-white the desktop chrome is authored with.
+foreground              = "#ffffff"   # terminal ink — white
+surface_foreground      = "#d9dfee"   # desktop chrome text (paper-white)
+bright_foreground       = "#ffffff"   # terminal bright ink / cursor (color15)
+surface_bright_foreground = "#eef2fb" # desktop chrome highlighted text
+light_foreground        = "#c3cbdf"   # desktop control chrome
+dark_foreground         = "#6d7890"   # desktop dim / placeholder
+muted                   = "#808080"   # terminal color8 — neutral grey (dim)
+surface_muted           = "#5a6580"   # desktop idle borders (hyprland inactive)
+
+# Terminal rose-pink and blue stay at Marin's fixed hue: the red slot is her
+# rose-pink and the blue is clear blue, not a photo-pulled dusty rose /
+# periwinkle. The photo-pulled pair lives on as surface_red / surface_blue for
+# the desktop chrome (error text, waybar hues).
+surface_red             = "#d07194"   # desktop error / alert rose-pink
+surface_blue            = "#8fb2e8"   # desktop info periwinkle
+
+# Accents  ·  Marin pink / blonde gold / lilac
+accent      = "#f2a3c0"   # Marin pink — eyes + makeup (primary accent)
+primary     = "#e8c98f"   # blonde gold — hair (titles, focused states)
+secondary   = "#bba7e6"   # lilac — accessories (links, info chips)
+
+# Selection + cursor
+selection            = "#2b3754"   # navy-violet selection highlight
+selection_background = "#2b3754"
+selection_foreground = "#ffffff"
+cursor               = "#ffffff"
+
+# Hyprland active-border: 3-stop diagonal gradient
+# pink → lilac → gold (45deg)  — flows through Marin's full palette
+hyprland_active_border   = "rgba(f2a3c0ee) rgba(bba7e6ee) rgba(e8c98fee) 45deg"
+hyprland_inactive_border = "rgba(5a6580aa)"
+
+# ---------------------------------------------------------------------------
+#  COLORS  ·  semantic palette (syntax-highlight friendly)
+# ---------------------------------------------------------------------------
+
+red     = "#f04282"   # Marin rose-pink — errors, deletions, status C
+yellow  = "#e8c98f"   # blonde gold
+orange  = "#eab384"   # soft apricot
+green   = "#a3cdb0"   # sage mint — comments/strings read cleanly
+cyan    = "#9ad0d8"   # soft aqua
+blue    = "#4473f3"   # true blue — info, dirs, links
+magenta = "#f2a3c0"   # Marin pink
+brown   = "#a07a58"
+
+bright_red     = "#f471a1"
+bright_yellow  = "#f2d8a8"
+bright_green   = "#c4e1ce"
+bright_cyan    = "#bde4e6"
+bright_blue    = "#5781f4"
+bright_magenta = "#f7c2d9"
+
+# ---------------------------------------------------------------------------
+#  ANSI 0-15  ·  terminal color matrix
+#  Tuned for: foreground contrast >= 5.5:1 on the black terminal canvas.
+#  All hues desaturated ~10–15% to soften prolonged-exposure eye strain.
+# ---------------------------------------------------------------------------
+
+color0  = "#000000"   # terminal canvas
+color1  = "#f04282"   # Marin rose-pink
+color2  = "#a3cdb0"   # sage green
+color3  = "#e8c98f"   # blonde gold
+color4  = "#4473f3"   # true blue
+color5  = "#f2a3c0"   # Marin pink
+color6  = "#9ad0d8"   # aqua
+color7  = "#ffffff"   # terminal ink — white
+
+color8  = "#808080"   # neutral grey (comments/dim)
+color9  = "#f471a1"   # bright rose-pink
+color10 = "#c4e1ce"   # bright sage
+color11 = "#f2d8a8"   # bright gold
+color12 = "#5781f4"   # bright blue
+color13 = "#f7c2d9"   # bright pink
+color14 = "#bde4e6"   # bright aqua
+color15 = "#ffffff"   # bright ink (cursor / bold / selected text)

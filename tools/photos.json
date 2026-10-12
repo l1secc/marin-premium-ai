@@ -1,0 +1,16 @@
+{
+  "_note": "Marin Premium AI — photo-theme manifest. Wallpapers are AI-generated (no human author, so the image files carry no copyright); the character Marin Kitagawa remains the IP of its rights holders. src paths are relative to SOURCE_ROOT.",
+  "source_root": "~/marin-premium-ai/sources",
+  "photos": [
+    { "num": "01", "slug": "marin-ai-01-blossom", "name": "Marin Premium AI 01 Blossom", "title": "Çiçek Mevsimi", "file": "Marin-ai-01-blossom", "src": "source-01.jpg", "focus": "center", "palette": "photo" },
+    { "num": "02", "slug": "marin-ai-02-neon", "name": "Marin Premium AI 02 Neon", "title": "Neon Gece", "file": "Marin-ai-02-neon", "src": "source-02.jpg", "focus": "center", "palette": "photo" },
+    { "num": "03", "slug": "marin-ai-03-autumn", "name": "Marin Premium AI 03 Autumn", "title": "Sonbahar", "file": "Marin-ai-03-autumn", "src": "source-03.jpg", "focus": "center", "palette": "photo" },
+    { "num": "04", "slug": "marin-ai-04-snow", "name": "Marin Premium AI 04 Snow", "title": "Kar", "file": "Marin-ai-04-snow", "src": "source-04.jpg", "focus": "center", "palette": "photo" },
+    { "num": "05", "slug": "marin-ai-05-starry", "name": "Marin Premium AI 05 Starry", "title": "Yıldızlı Gece", "file": "Marin-ai-05-starry", "src": "source-05.jpg", "focus": "center", "palette": "photo" },
+    { "num": "06", "slug": "marin-ai-06-class", "name": "Marin Premium AI 06 Class", "title": "Sınıf", "file": "Marin-ai-06-class", "src": "source-06.jpg", "focus": "center", "palette": "photo" },
+    { "num": "07", "slug": "marin-ai-07-cafe", "name": "Marin Premium AI 07 Cafe", "title": "Kafe", "file": "Marin-ai-07-cafe", "src": "source-07.jpg", "focus": "center", "palette": "photo" },
+    { "num": "08", "slug": "marin-ai-08-festival", "name": "Marin Premium AI 08 Festival", "title": "Festival", "file": "Marin-ai-08-festival", "src": "source-08.jpg", "focus": "center", "palette": "photo" },
+    { "num": "09", "slug": "marin-ai-09-flower", "name": "Marin Premium AI 09 Flower", "title": "Çiçek Tarlası", "file": "Marin-ai-09-flower", "src": "source-09.jpg", "focus": "center", "palette": "photo" },
+    { "num": "10", "slug": "marin-ai-10-beach", "name": "Marin Premium AI 10 Beach", "title": "Sahil", "file": "Marin-ai-10-beach", "src": "source-10.jpg", "focus": "center", "palette": "photo" }
+  ]
+}

@@ -1,0 +1,145 @@
+# ============================================================================
+#  Marin Kitagawa — "Marin Premium"  ·  Omarchy Quattro shell surfaces
+#  Glassmorphism-leaning navy surfaces with pink / gold / lilac accents.
+#  Every surface uses translucent navy so the desktop can breathe through.
+# ============================================================================
+
+[bar]
+background       = "#0f1522"
+background-alpha = 0.88
+text             = "#d9dfee"
+active           = "#f2a3c0"
+scale-with-font  = true
+size-horizontal  = 30
+size-vertical    = 32
+
+[hyprland]
+# Same 3-stop gradient as the active window border — visual unity
+active-border            = "rgba(f2a3c0ee) rgba(bba7e6ee) rgba(e8c98fee) 45deg"
+active-border-foreground = "#f2a3c0"
+
+[controls]
+normal-color        = "#c3cbdf"
+normal-fill-alpha   = 0.05
+normal-border       = "#c3cbdf"
+normal-border-width = 1
+normal-border-alpha = 0.30
+
+hover-cursor-color        = "#eef2fb"
+hover-cursor-fill-alpha   = 0.10
+hover-cursor-border       = "#f2a3c0"
+hover-cursor-border-width = 1
+hover-cursor-border-alpha = 0.55
+
+focus-color        = "#f2a3c0"
+focus-fill-alpha   = 0.12
+focus-border       = "#f2a3c0"
+focus-border-width = 1
+focus-border-alpha = 0.85
+
+selected-color        = "#e8c98f"
+selected-fill-alpha   = 0.18
+selected-border       = "#e8c98f"
+selected-border-width = 1
+selected-border-alpha = 0.60
+
+pressed-fill-alpha   = 0.22
+selection-fill-alpha = 0.35
+
+[spacing]
+scale            = 1.0
+scale-with-font  = true
+
+[font]
+base-size = 12
+
+[popups]
+background       = "#141c2e"
+background-alpha = 0.92
+text             = "#d9dfee"
+border           = "hyprland.active-border"
+border-alpha     = 1.0
+border-width     = 2
+
+[tooltip]
+background       = "#141c2e"
+background-alpha = 0.92
+text             = "#eef2fb"
+border           = "#f2a3c0"
+border-alpha     = 1.0
+border-width     = 1
+
+[notifications]
+background       = "#141c2e"
+background-alpha = 0.92
+text             = "#d9dfee"
+border           = "hyprland.active-border"
+border-alpha     = 1.0
+border-width     = 2
+countdown        = "#f2a3c0"
+
+[launcher]
+background                = "#0f1522"
+background-alpha          = 0.95
+text                      = "#eef2fb"
+border                    = "#f2a3c0"
+border-alpha              = 1.0
+scrim                     = "#0f1522"
+scrim-alpha               = 0.55
+selected-background       = "#2b3754"
+selected-background-alpha = 0.30
+selected-text             = "#f7c2d9"
+selected-border           = "#f2a3c0"
+selected-border-alpha     = 0.94
+selected-border-width     = 1
+
+[menu]
+background                = "#0f1522"
+background-alpha          = 0.95
+text                      = "#eef2fb"
+border                    = "#f2a3c0"
+border-alpha              = 1.0
+scrim                     = "#0f1522"
+scrim-alpha               = 0.55
+selected-background       = "#2b3754"
+selected-background-alpha = 0.30
+selected-text             = "#f7c2d9"
+selected-border           = "#f2a3c0"
+selected-border-alpha     = 0.94
+selected-border-width     = 1
+
+[polkit]
+background       = "#0f1522"
+background-alpha = 0.95
+text             = "#d9dfee"
+text-error       = "#d07194"
+border           = "hyprland.active-border"
+border-error     = "#d07194"
+border-alpha     = 1.0
+border-width     = 2
+scrim            = "#0f1522"
+scrim-alpha      = 0.5
+accent           = "#f2a3c0"
+
+[lock]
+background       = "#0f1522"
+background-alpha = 0.80
+text             = "#d9dfee"
+placeholder      = "#6d7890"
+text-error       = "#d07194"
+border           = "hyprland.active-border"
+border-active    = "hyprland.active-border"
+border-error     = "#d07194"
+border-alpha     = 1.0
+border-width     = 2
+selection        = "#f2a3c0"
+selection-alpha  = 0.45
+
+[image-picker]
+scrim                   = "#0f1522"
+scrim-alpha             = "0.5"
+text                    = "#d9dfee"
+selected-border         = "#f2a3c0"
+selected-border-alpha   = 1.0
+unselected-border       = "#c3cbdf"
+unselected-border-alpha = 0.28

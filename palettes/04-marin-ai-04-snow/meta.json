@@ -1,0 +1,17 @@
+{
+  "num": "04",
+  "slug": "marin-ai-04-snow",
+  "theme": "Marin Premium AI 04 Snow",
+  "title": "Kar",
+  "wallpaper": "Marin-ai-04-snow.jpg",
+  "source": "source-04.jpg",
+  "source_root": "~/marin-premium-ai/sources",
+  "palette": {
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "accent": "#d69b9a",
+    "primary": "#d7b19d",
+    "secondary": "#5c8abc"
+  },
+  "generator": "tools/marin_generate.py"
+}

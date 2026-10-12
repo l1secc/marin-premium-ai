@@ -1,0 +1,41 @@
+[Unit]
+Description=Marin Premium — retint the palette when the Omarchy background changes
+Documentation=https://github.com/l1secc/marin-premium
+# Omarchy's own background picker only swaps the wallpaper. This watcher keeps
+# the terminal, bar, menu, launcher and lock palette in step with the photo.
+# Wait for uwsm's imported session environment (WAYLAND_DISPLAY) so the shell
+# IPC and notifications reach the running desktop.
+After=graphical-session.target
+PartOf=graphical-session.target
+ConditionEnvironment=WAYLAND_DISPLAY
+# A crash loop must not burn CPU: give up after 5 starts in 30s.
+StartLimitIntervalSec=30
+StartLimitBurst=5
+
+[Service]
+Type=simple
+ExecStart=@WATCHER@
+Restart=always
+RestartSec=3
+
+# The watcher only stages colour files and talks to the running shell, so it can
+# be locked down: no privilege gain, no writes outside the user's own tree, no
+# kernel surfaces. The old full `omarchy-theme-set` path needed sudo for the
+# browser-policy hook; the light retint does not, which is what makes this safe.
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+# Resource ceiling: a runaway sync can never starve the session.
+MemoryMax=512M
+CPUQuota=50%
+TasksMax=128
+
+[Install]
+WantedBy=graphical-session.target

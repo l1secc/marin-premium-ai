@@ -1,0 +1,226 @@
+/* ============================================================================
+   Marin Kitagawa — "Marin Premium" · Çiçek Tarlası  ·  Waybar
+   Retinted from the wallpaper palette by tools/marin_generate.py
+   surface #231d16 · accent #cc8683 · primary #dac5a5 · secondary #76bc5c
+   ========================================================================= */
+
+@define-color background      #231d16;
+@define-color background-alt  #2f251d;
+@define-color surface         rgba(47, 37, 29, 0.55);
+@define-color surface-hi      rgba(65, 51, 39, 0.65);
+@define-color foreground      #e1dedb;
+@define-color muted           #a18b78;
+@define-color pink            #cc8683;
+@define-color pink-bright     #edcad0;
+@define-color gold            #dac5a5;
+@define-color gold-bright     #ede1ca;
+@define-color lilac           #76bc5c;
+@define-color lilac-bright    #d2c4f0;
+@define-color rose            #c87482;
+@define-color sage            #8ad191;
+@define-color periwinkle       #91a3d4;
+@define-color border          rgba(204, 134, 131, 0.35);
+@define-color border-soft     rgba(118, 188, 92, 0.18);
+@define-color shadow          rgba(0, 0, 0, 0.45);
+
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrainsMono Nerd Font", "FiraCode Nerd Font", "CaskaydiaCove Nerd Font", monospace;
+    font-size: 13px;
+    min-height: 0;
+    font-weight: 500;
+}
+
+/* Bar itself: subtle dark tint lets the frosted cards float */
+window#waybar {
+    background: transparent;
+    color: @foreground;
+    transition: background 220ms ease;
+}
+
+window#waybar:placeholder {
+    background: rgba(35, 29, 22, 0.35);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Module groups — frosted-glass cards                                */
+/* ------------------------------------------------------------------ */
+.modules-left,
+.modules-center,
+.modules-right {
+    background: @surface;
+    border: 1px solid @border-soft;
+    border-radius: 12px;
+    margin: 6px 8px;
+    padding: 0 6px;
+    box-shadow:
+        0 4px 16px @shadow,
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.modules-left:hover,
+.modules-center:hover,
+.modules-right:hover {
+    background: @surface-hi;
+    border-color: @border;
+}
+
+#workspaces,
+#window,
+#clock,
+#battery,
+#cpu,
+#memory,
+#temperature,
+#network,
+#pulseaudio,
+#tray,
+#custom-* {
+    background: transparent;
+    padding: 0 10px;
+    margin: 0 2px;
+    border-radius: 8px;
+    transition: all 200ms ease;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Workspaces — active one glows pink → gold (Marin's signature)      */
+/* ------------------------------------------------------------------ */
+#workspaces button {
+    padding: 0 9px;
+    color: @muted;
+    background: transparent;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    font-weight: 600;
+}
+
+#workspaces button:hover {
+    background: rgba(204, 134, 131, 0.12);
+    color: @pink-bright;
+    border-color: rgba(204, 134, 131, 0.25);
+    box-shadow: 0 0 12px rgba(204, 134, 131, 0.20);
+}
+
+#workspaces button.active {
+    background: linear-gradient(
+        135deg,
+        rgba(204, 134, 131, 0.32),
+        rgba(218, 197, 165, 0.32)
+    );
+    color: @foreground;
+    border: 1px solid rgba(204, 134, 131, 0.55);
+    box-shadow:
+        0 0 16px rgba(204, 134, 131, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+#workspaces button.urgent {
+    background: rgba(200, 116, 130, 0.32);
+    color: @rose;
+    border: 1px solid rgba(200, 116, 130, 0.55);
+    animation: urgent-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes urgent-pulse {
+    0%, 100% { opacity: 1.0; }
+    50%      { opacity: 0.55; }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Widgets — per-module color hints                                   */
+/* ------------------------------------------------------------------ */
+#window {
+    color: @foreground;
+    font-weight: 600;
+    font-style: italic;
+}
+
+#clock {
+    color: @gold-bright;
+    font-weight: 700;
+    font-size: 13.5px;
+    text-shadow: 0 0 8px rgba(218, 197, 165, 0.20);
+}
+
+#clock.date {
+    color: @foreground;
+}
+
+#battery.charging,
+#battery.plugged {
+    color: @lilac-bright;
+}
+
+#battery.warning:not(.charging) {
+    color: @gold;
+}
+
+#battery.critical:not(.charging) {
+    color: @rose;
+    animation: blink 1s infinite;
+}
+
+#network {
+    color: @lilac;
+}
+
+#network.disconnected {
+    color: @muted;
+}
+
+#pulseaudio {
+    color: @pink-bright;
+}
+
+#pulseaudio.muted {
+    color: @muted;
+}
+
+#cpu,
+#memory,
+#temperature {
+    color: @lilac;
+}
+
+#cpu.high,
+#temperature.hot {
+    color: @gold;
+}
+
+#temperature.critical {
+    color: @rose;
+}
+
+#tray {
+    color: @foreground;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    color: @rose;
+}
+
+/* Tooltip */
+tooltip {
+    background: rgba(47, 37, 29, 0.92);
+    border: 1px solid @border;
+    border-radius: 10px;
+    color: @foreground;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+tooltip label {
+    padding: 6px 10px;
+}
+
+/* Smooth blink for critical states */
+@keyframes blink {
+    0%   { opacity: 1.0; }
+    50%  { opacity: 0.35; }
+    100% { opacity: 1.0; }
+}

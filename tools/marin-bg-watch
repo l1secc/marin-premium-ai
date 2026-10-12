@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# omarchy:summary=Retint the Marin palette whenever the Omarchy background changes
+# omarchy:args=[--once]
+# omarchy:hidden=true
+
+# Omarchy's own background switcher (`omarchy menu` → Style → Background, the
+# image picker, `omarchy theme bg next`, the Super+Alt+Space picker) only swaps
+# the wallpaper: it never re-applies the theme, so a Marin photo picked there
+# used to keep the previous photo's terminal and menu palette.
+#
+# This watcher closes that gap. It watches the Omarchy current-background
+# symlink and, whenever it points at one of the Marin photos, calls
+# `marin-next sync --quiet` — which retints the terminal, the bar / menu /
+# launcher / lock surfaces and the running Foot windows to that photo.
+#
+# `marin-next sync` is a no-op when the staged palette already is the photo's
+# palette, so the Marin switcher's own wallpaper change (which retints first
+# and then pins the photo) settles after at most one no-op pass.
+#
+# Run as a systemd user service: systemd/marin-premium-bg-sync.service.
+
+set -uo pipefail
+
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/current"
+LINK="$STATE_DIR/background"
+DEBOUNCE="${MARIN_BG_DEBOUNCE:-0.4}"
+INTERVAL="${MARIN_BG_POLL_INTERVAL:-2}"
+
+HERE="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -x $HERE/marin-next ]]; then
+  MARIN_NEXT="$HERE/marin-next"
+else
+  MARIN_NEXT="$(command -v marin-next 2>/dev/null || true)"
+fi
+
+current() { readlink -f "$LINK" 2>/dev/null || true; }
+
+sync_now() {
+  local target
+  target="$(current)"
+  [[ -n $target ]] || return 0
+  [[ $target == "${last:-}" ]] && return 0
+  last="$target"
+
+  [[ -n $MARIN_NEXT ]] || {
+    printf 'marin-bg-watch: marin-next not found\n' >&2
+    return 0
+  }
+
+  # Only act while the Marin theme is the one on screen.
+  [[ "$(cat "$STATE_DIR/theme.name" 2>/dev/null)" == "marin-premium" ]] || return 0
+
+  "$MARIN_NEXT" sync --light --quiet || printf 'marin-bg-watch: sync failed for %s\n' "$target" >&2
+  return 0
+}
+
+if [[ ${1:-} == "--once" ]]; then
+  last=""
+  sync_now
+  exit 0
+fi
+
+# Remember the photo that is already on screen; a retint is only needed once
+# the background actually changes.
+last="$(current)"
+
+if command -v inotifywait >/dev/null 2>&1; then
+  inotifywait -m -q -e create -e moved_to -e delete -e close_write -e attrib \
+    --format '%f' "$STATE_DIR" 2>/dev/null |
+    while IFS= read -r name; do
+      [[ $name == background ]] || continue
+      sleep "$DEBOUNCE" # let the symlink settle and coalesce event bursts
+      sync_now
+    done
+else
+  # No inotify-tools: poll. One readlink every couple of seconds is free.
+  while :; do
+    sleep "$INTERVAL"
+    sync_now
+  done
+fi

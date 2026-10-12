@@ -1,0 +1,17 @@
+{
+  "num": "01",
+  "slug": "marin-ai-01-blossom",
+  "theme": "Marin Premium AI 01 Blossom",
+  "title": "Çiçek Mevsimi",
+  "wallpaper": "Marin-ai-01-blossom.jpg",
+  "source": "source-01.jpg",
+  "source_root": "~/marin-premium-ai/sources",
+  "palette": {
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "accent": "#e1b4c4",
+    "primary": "#c18368",
+    "secondary": "#e2b8b9"
+  },
+  "generator": "tools/marin_generate.py"
+}

@@ -1,0 +1,17 @@
+{
+  "num": "07",
+  "slug": "marin-ai-07-cafe",
+  "theme": "Marin Premium AI 07 Cafe",
+  "title": "Kafe",
+  "wallpaper": "Marin-ai-07-cafe.jpg",
+  "source": "source-07.jpg",
+  "source_root": "~/marin-premium-ai/sources",
+  "palette": {
+    "background": "#000000",
+    "foreground": "#ffffff",
+    "accent": "#eba589",
+    "primary": "#e8c691",
+    "secondary": "#ca7d8f"
+  },
+  "generator": "tools/marin_generate.py"
+}
